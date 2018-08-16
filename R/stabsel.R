@@ -315,7 +315,11 @@ run_stabsel <- function(fitter, args.fitter,
     if (!is.list(res[[1]]) || !"selected" %in% names(res[[1]]))
         stop(sQuote("fitfun"), " must return a list with a named element called ",
              sQuote("selected"), ", and an optional second element called ", sQuote("path"))
-
+    thescores <- NULL
+    if (!is.null(res[[1]]$scores)) {
+      thescores <- lapply(res, "[[", "scores")
+    }
+    
     phat <- NULL
     if (!is.null(res[[1]]$path)) {
         ## extract selection paths
@@ -354,11 +358,11 @@ run_stabsel <- function(fitter, args.fitter,
                 selected = which(colMeans(res) >= cutoff),
                 max = colMeans(res))
     ret <- c(ret, pars)
-
+    ret$Scores <- thescores
+    
     ## return violations as attribute
     if (any(violations))
         attr(ret, "violations") <- violations
-
     class(ret) <- "stabsel"
     ret
 }
